@@ -7,6 +7,7 @@ import { TenantsModule } from './tenants/tenants.module';
 import { SellersModule } from './sellers/sellers.module';
 import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [UsersModule, TenantsModule, SellersModule, ProductsModule, OrdersModule, TypeOrmModule.forRoot({
@@ -23,7 +24,7 @@ import { OrdersModule } from './orders/orders.module';
       extra: { 
         trustServerCertificate: true 
       }
-    })],
+    }), AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
