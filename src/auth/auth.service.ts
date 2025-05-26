@@ -5,6 +5,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -13,14 +14,17 @@ export class AuthService {
         private jwtService: JwtService,
     ) { }
 
-    async validateUser(email: string, password: string): Promise<any> {
-        const user = await this.usersService.findByEmail(email);
-        if (user && await bcrypt.compare(password, user.password)) {
-            const { password, ...result } = user;
-            return result;
-        }
-        return null;
-    }
+    async validateUser(email: string, pass: string): Promise<any> {
+        const user = await this.usersService.findByEmail(email, true);
+        if (!user) return null;
+        if (!user.password) {
+            throw new Error('Password missing in database');
+          }
+        const isMatch = await bcrypt.compare(pass, user.password);
+        if (!isMatch) return null;
+      
+        return user; 
+      }
     async register(createUserDto: CreateUserDto) {
         const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
         const user = await this.usersService.create({
@@ -30,8 +34,15 @@ export class AuthService {
         return { message: 'Utilisateur créé', userId: user.id };
     }
 
-    async login(user: any) {
-        const payload = { email: user.email, sub: user.id, role: user.role };
+    async login(user: User) {
+        if (!user?.id) {
+            throw new Error('User object is invalid');
+        }
+        const payload = {
+            sub: user.id,
+            email: user.email,
+            role: user.role,
+        };
         return {
             access_token: this.jwtService.sign(payload),
             refresh_token: this.generateRefreshToken(payload),
