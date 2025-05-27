@@ -1,41 +1,44 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Request, SetMetadata, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { UserRole } from './user.entity';
+import { UsersService } from './users.service'
+
 
 @Controller('users')
-@UseGuards(JwtAuthGuard)
 export class UsersController {
+  constructor(private readonly usersService: UsersService) { }
 
-  @Get('admin-data')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  getAdminData(@Request() req) {
-    return {
-      message: 'Données accessibles uniquement aux administrateurs.',
-      user: req.user,
-    };
-  }
 
-  
-  @Get('seller-data')
+  @Get('profile-seller')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
-  @UseGuards(RolesGuard)
-  getSellerData(@Request() req) {
-    console.log('User in controller:', req.user);
-    return { message: 'Accès autorisé', user: req.user };
-
+  getProfileSeller(@Request() req) {
+    console.log('Controller - Verified user:', req.user);
+    return this.usersService.findOne(req.user.id);
   }
 
 
-  @Get('customer-data')
-  @UseGuards(RolesGuard)
+
+
+  @Get('profile-admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  testAdmin() {
+    return 'test admin';
+  }
+
+
+
+
+  @Get('profile-customer')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.CUSTOMER)
-  getCustomerData(@Request() req) {
-    return {
-      message: 'Données accessibles uniquement aux clients.',
-      user: req.user,
-    };
+  testCustomer() {
+    return 'test admin';
   }
 }
+
+
+

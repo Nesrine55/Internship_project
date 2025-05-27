@@ -14,7 +14,7 @@ export class Order {
   totalPrice: number;
 
   @Column()
-  status: string; // 'pending', 'completed', 'cancelled'
+  status: string; 
 
   @ManyToOne(() => User, user => user.orders)
   user: User;

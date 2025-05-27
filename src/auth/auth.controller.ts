@@ -7,16 +7,16 @@ import { LocalStrategy } from './local.strategy';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) { }
-
   @Post('login')
   @UseGuards(LocalAuthGuard)
   async login(@Req() req) {
-    console.log('User in login:', req.user); // Debug
+    console.log('User in login:', req.user); 
     if (!req.user) {
       throw new BadRequestException('Utilisateur non trouvé');
     }
     return this.authService.login(req.user);
   }
+
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     return this.authService.register(createUserDto);
