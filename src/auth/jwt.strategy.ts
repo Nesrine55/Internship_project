@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService } from './auth.service';
 import { AuthJwtPayload } from './types/auth-jwtPayload';
 import { CurrentUser } from './types/current-user';
+import { UserRole } from 'src/users/user.entity';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,9 +19,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: AuthJwtPayload): Promise<CurrentUser> {
     console.log('JwtStrategy.validate called with payload:', payload);
-    const user = await this.authService.validateJwtUser(payload.sub);
 
-    console.log('JwtStrategy - returning user:', user); 
-    return user;
+    return {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role as UserRole,
+      tenantId: payload.tenantId,
+    };
   }
+
 }

@@ -25,8 +25,10 @@ export class UsersService {
     };
 
     if (withPassword) {
-      options.select = ['id', 'email', 'password', 'role'];
-    }
+      options.select = ['id', 'email', 'password', 'role','tenantId'];
+    }else {
+    options.select = ['id', 'email', 'role', 'tenantId']; 
+  }
 
     return this.usersRepository.findOne(options);
   }

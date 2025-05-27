@@ -22,7 +22,7 @@ export class AuthService {
             id: user.id,
             email: user.email,
             role: user.role,
-            tenantId: user.tenant?.id,
+            tenantId: user.tenantId,
         };
     }
 
@@ -51,7 +51,7 @@ export class AuthService {
             sub: user.id,
             email: user.email,
             role: user.role,
-            tenantId: user.tenant?.id, 
+            tenantId: user.tenantId, 
         };
         console.log('Token Payload:', payload);
 
