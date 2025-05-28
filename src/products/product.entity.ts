@@ -16,9 +16,13 @@ export class Product {
 
   @Column()
   stock: number;
-  
+
   @Column('decimal')
   price: number;
+
+  
+  @Column({ nullable: true })
+  imageUrl: string;
 
   @ManyToOne(() => Tenant, tenant => tenant.products)
   tenant: Tenant;
