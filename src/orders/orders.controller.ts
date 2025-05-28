@@ -1,41 +1,48 @@
-import { Controller, Post, Get, Patch, Param, Body } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Param, Body, BadRequestException } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { UserRole } from '../users/user.entity';
+import { CreateOrderDto } from 'src/users/dto/create-order.dto';
+import { UpdateOrderDto } from 'src/users/dto/update-order.dto';
 
 @Controller('orders')
 @UseGuards(JwtAuthGuard, RolesGuard)
 
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+    constructor(private readonly ordersService: OrdersService) { }
 
-  @Post()
-  @Roles(UserRole.CUSTOMER, UserRole.ADMIN)
-  createOrder(@Body() body: { userId: number; productId: number; quantity: number }) {
-    return this.ordersService.createOrder(body.userId, body.productId, body.quantity);
-  }
+    @Post()
+    @Roles(UserRole.CUSTOMER, UserRole.ADMIN)
+    createOrder(@Body() createOrderDto: CreateOrderDto) {
+        const { userId, productId, quantity } = createOrderDto;
 
-  @Get('user/:userId')
-  @Roles(UserRole.CUSTOMER, UserRole.ADMIN)
+        return this.ordersService.createOrder(userId, productId, quantity);
+    }
 
-  getUserOrders(@Param('userId') userId: number) {
-    return this.ordersService.getOrdersByUser(userId);
-  }
+    @Get('user/:userId')
+    @Roles(UserRole.CUSTOMER, UserRole.ADMIN)
 
-  @Patch(':id/status')
-  @Roles(UserRole.ADMIN, UserRole.SELLER)
+    getUserOrders(@Param('userId') userId: number) {
+        return this.ordersService.getOrdersByUser(userId);
+    }
 
-  updateStatus(@Param('id') id: number, @Body() body: { status: string }) {
-    return this.ordersService.updateStatus(id, body.status);
-  }
+    @Patch(':id/status')
+    @Roles(UserRole.ADMIN, UserRole.SELLER)
 
-  @Post(':id/pay')
-  @Roles(UserRole.CUSTOMER)
+    updateStatus(@Param('id') id: number, @Body() updateOrderDto: UpdateOrderDto) {
+        if (!updateOrderDto.status) {
+            throw new BadRequestException('Status is required');
+        }
+        return this.ordersService.updateStatus(id, updateOrderDto.status);
+    }
 
-  payOrder(@Param('id') id: number) {
-    return this.ordersService.payOrder(id);
-  }
+    @Post(':id/pay')
+    @Roles(UserRole.CUSTOMER)
+
+    payOrder(@Param('id') id: number) {
+        return this.ordersService.payOrder(id);
+    }
 }
