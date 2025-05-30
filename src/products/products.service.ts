@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import { Product } from './product.entity';
 import { S3Service } from 'src/aws/s3.service';
 import { User } from 'src/users/user.entity';
-import { CreateProductDto } from 'src/users/dto/create-product.dto';
-import { UpdateProductDto } from 'src/users/dto/update-product.dto';
+import { CreateProductDto } from 'src/products/dto/create-product.dto';
+import { UpdateProductDto } from 'src/products/dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {

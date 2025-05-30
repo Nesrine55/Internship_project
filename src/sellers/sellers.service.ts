@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Seller } from './seller.entity';
-import { CreateSellerDto } from '../users/dto/create-seller.dto';
-import { UpdateSellerDto } from '../users/dto/update-seller.dto';
+import { CreateSellerDto } from './dto/create-seller.dto';
+import { UpdateSellerDto } from './dto/update-seller.dto';
 import { UsersService } from '../users/users.service';
 import { UserRole } from 'src/users/user.entity';
 import { CurrentUser } from 'src/auth/types/current-user';
@@ -78,7 +78,6 @@ export class SellersService {
 
     async findSellersByUser(user: CurrentUser): Promise<Seller[]> {
     if (user.role === UserRole.ADMIN) {
-      // Admin : tous les sellers du tenant
       return this.sellersRepository.find({
         where: { user: { tenantId: user.tenantId } },
         relations: ['user', 'products'],

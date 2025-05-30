@@ -15,7 +15,11 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) { }
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.usersRepository.create(createUserDto);
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const user = this.usersRepository.create({
+    ...createUserDto,
+    password: hashedPassword,
+  });
     return this.usersRepository.save(user);
   }
   async findByEmail(email: string, withPassword = false): Promise<User | null> {
@@ -33,11 +37,12 @@ export class UsersService {
     return this.usersRepository.findOne(options);
   }
 
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.findByEmail(email);
+  async validateUser(email: string, password: string): Promise<Omit<User, 'password'> | null>  {
+    const user = await this.findByEmail(email, true);
     if (user && await bcrypt.compare(password, user.password)) {
-      return user;
-    }
+    const { password: _, ...result } = user;
+    return result;
+  }
     return null;
   }
 
